@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: taro
+
+youbike:
+  api:
+    taipei-url: https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json
+    new-taipei-url: https://data.ntpc.gov.tw/api/datasets/010e5b15-3823-4b20-b401-b1cf000550c5/json?size=10000
+  default-radius: 500
+
+cwa:
+  api-key: ${CWA_API_KEY}
+  base-url: https://opendata.cwa.gov.tw/api/v1/rest/datastore
+
+moenv:
+  api-key: ${MOENV_API_KEY}
+  base-url: https://data.moenv.gov.tw/api/v2
+
+tdx:
+  client-id: ${TDX_CLIENT_ID}
+  client-secret: ${TDX_CLIENT_SECRET}
+  base-url: https://tdx.transportdata.tw/api/basic
+  auth-url: https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token
