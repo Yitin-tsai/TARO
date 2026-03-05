@@ -20,7 +20,7 @@ public class MetroClient {
     private final WebClient tdxWebClient;
     private final TdxAuthClient tdxAuthClient;
 
-    @Cacheable("metroStations")
+    @Cacheable(value = "metroStations", sync = true)
     public List<TdxMetroStation> fetchAllStations() {
         log.info("Fetching all metro stations from TDX");
 
@@ -35,7 +35,7 @@ public class MetroClient {
         return stations;
     }
 
-    @Cacheable("metroTimeTables")
+    @Cacheable(value = "metroTimeTables", sync = true)
     public List<TdxStationTimeTable> fetchAllTimeTables() {
         log.info("Fetching all metro station timetables from TDX");
 
@@ -50,7 +50,7 @@ public class MetroClient {
         return timeTables;
     }
 
-    @Cacheable("metroExits")
+    @Cacheable(value = "metroExits", sync = true)
     public List<TdxStationExit> fetchAllExits() {
         log.info("Fetching all metro station exits from TDX");
 

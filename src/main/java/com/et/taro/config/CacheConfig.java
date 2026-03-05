@@ -24,7 +24,8 @@ public class CacheConfig {
                 buildCache("airQuality", Duration.ofMinutes(15), 10),
                 buildCache("metroStations", Duration.ofHours(24), 10),
                 buildCache("metroTimeTables", Duration.ofHours(24), 10),
-                buildCache("metroExits", Duration.ofHours(24), 10)
+                buildCache("metroExits", Duration.ofHours(24), 10),
+                buildCache("busRoutes", Duration.ofHours(24), 10)
         ));
         return manager;
     }

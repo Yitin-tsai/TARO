@@ -12,5 +12,6 @@ public class DashboardResponse {
     private WeatherResponse weather;
     private AirQualityResponse airQuality;
     private MetroResponse metro;
+    private BusResponse bus;
     private List<YouBikeStationResponse> youbike;
 }

@@ -18,10 +18,11 @@ public class DashboardService {
     private final WeatherService weatherService;
     private final AirQualityService airQualityService;
     private final MetroService metroService;
+    private final BusService busService;
     private final YouBikeService youBikeService;
 
     public DashboardResponse getDashboard(double lat, double lng) {
-        // 四個服務平行查詢
+        // 五個服務平行查詢
         CompletableFuture<WeatherResponse> weatherFuture = CompletableFuture
                 .supplyAsync(() -> safeCall(() -> weatherService.getWeather(lat, lng), "weather"));
 
@@ -31,18 +32,23 @@ public class DashboardService {
         CompletableFuture<MetroResponse> metroFuture = CompletableFuture
                 .supplyAsync(() -> safeCall(() -> metroService.getNearbyArrivals(lat, lng), "metro"));
 
+        // 公車串在捷運後面跑，避免同時打 TDX 觸發 429 rate limit
+        CompletableFuture<BusResponse> busFuture = metroFuture
+                .handleAsync((result, ex) -> safeCall(() -> busService.getNearbyArrivals(lat, lng), "bus"));
+
         CompletableFuture<List<YouBikeStationResponse>> youbikeFuture = CompletableFuture
                 .supplyAsync(() -> safeCall(() -> {
                     List<YouBikeStationResponse> stations = youBikeService.findNearby(lat, lng, null);
                     return stations.size() > YOUBIKE_LIMIT ? stations.subList(0, YOUBIKE_LIMIT) : stations;
                 }, "youbike"));
- 
-        CompletableFuture.allOf(weatherFuture, aqiFuture, metroFuture, youbikeFuture).join();
+
+        CompletableFuture.allOf(weatherFuture, aqiFuture, metroFuture, busFuture, youbikeFuture).join();
 
         return DashboardResponse.builder()
                 .weather(weatherFuture.join())
                 .airQuality(aqiFuture.join())
                 .metro(metroFuture.join())
+                .bus(busFuture.join())
                 .youbike(youbikeFuture.join())
                 .build();
     }
