@@ -39,6 +39,11 @@ out/
 
 ### Local secrets ###
 application-local.yml
+env.yaml
+
+### Node / Frontend ###
+node_modules/
+taro-web/dist/
 
 ### Claude Code ###
 .claude/
