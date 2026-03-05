@@ -17,6 +17,7 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:4173",
+                "https://taro-web.yitintsai0906.workers.dev",
                 "https://cloudflare-workers-autoconfig-taro-web.yitintsai0906.workers.dev"
         ));
         config.setAllowedMethods(List.of("GET", "OPTIONS"));
