@@ -29,3 +29,11 @@ resilience4j:
         limit-for-period: 2
         limit-refresh-period: 1s
         timeout-duration: 15s
+  retry:
+    instances:
+      tdx:
+        max-attempts: 3
+        wait-duration: 1s
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientResponseException$TooManyRequests

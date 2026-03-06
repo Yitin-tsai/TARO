@@ -4,6 +4,7 @@ import com.et.taro.dto.tdx.TdxMetroStation;
 import com.et.taro.dto.tdx.TdxStationExit;
 import com.et.taro.dto.tdx.TdxStationTimeTable;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +22,7 @@ public class MetroClient {
     private final WebClient tdxWebClient;
     private final TdxAuthClient tdxAuthClient;
 
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     @Cacheable(value = "metroStations", sync = true)
     public List<TdxMetroStation> fetchAllStations() {
@@ -37,6 +39,7 @@ public class MetroClient {
         return stations;
     }
 
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     @Cacheable(value = "metroTimeTables", sync = true)
     public List<TdxStationTimeTable> fetchAllTimeTables() {
@@ -53,6 +56,7 @@ public class MetroClient {
         return timeTables;
     }
 
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     @Cacheable(value = "metroExits", sync = true)
     public List<TdxStationExit> fetchAllExits() {

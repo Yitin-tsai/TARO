@@ -4,12 +4,14 @@ import com.et.taro.dto.tdx.TdxBusEstimate;
 import com.et.taro.dto.tdx.TdxBusRoute;
 import com.et.taro.dto.tdx.TdxBusStop;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public class BusClient {
     /**
      * 使用 TDX 空間查詢找附近公車站牌
      */
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     public List<TdxBusStop> fetchNearbyStops(String city, double lat, double lng, int radiusMeters) {
         String uri = String.format(
@@ -44,6 +47,9 @@ public class BusClient {
             if (stops == null) return List.of();
             log.info("Fetched {} bus stops for {}", stops.size(), city);
             return stops;
+        } catch (WebClientResponseException.TooManyRequests e) {
+            log.warn("TDX rate limited for bus stops {}, will retry", city);
+            throw e;
         } catch (Exception e) {
             log.error("Failed to fetch bus stops for {}", city, e);
             return List.of();
@@ -53,6 +59,7 @@ public class BusClient {
     /**
      * 查詢即時到站時間，用 StopID 過濾
      */
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     public List<TdxBusEstimate> fetchEstimates(String city, List<String> stopIds) {
         if (stopIds.isEmpty()) return List.of();
@@ -78,6 +85,9 @@ public class BusClient {
             if (estimates == null) return List.of();
             log.info("Fetched {} bus ETA entries for {}", estimates.size(), city);
             return estimates;
+        } catch (WebClientResponseException.TooManyRequests e) {
+            log.warn("TDX rate limited for bus ETA {}, will retry", city);
+            throw e;
         } catch (Exception e) {
             log.error("Failed to fetch bus ETA for {}", city, e);
             return List.of();
@@ -87,6 +97,7 @@ public class BusClient {
     /**
      * 查詢城市所有公車路線起迄站名，快取 24 小時
      */
+    @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
     @Cacheable(value = "busRoutes", sync = true)
     public List<TdxBusRoute> fetchRoutes(String city) {
@@ -107,6 +118,9 @@ public class BusClient {
             if (routes == null) return List.of();
             log.info("Fetched {} bus routes for {}", routes.size(), city);
             return routes;
+        } catch (WebClientResponseException.TooManyRequests e) {
+            log.warn("TDX rate limited for bus routes {}, will retry", city);
+            throw e;
         } catch (Exception e) {
             log.error("Failed to fetch bus routes for {}", city, e);
             return List.of();
