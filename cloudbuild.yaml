@@ -6,3 +6,6 @@ steps:
       - 'taro'
       - '--source=.'
       - '--region=asia-east1'
+
+options:
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
