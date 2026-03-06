@@ -26,6 +26,6 @@ resilience4j:
   ratelimiter:
     instances:
       tdx:
-        limit-for-period: 5
+        limit-for-period: 2
         limit-refresh-period: 1s
-        timeout-duration: 10s
+        timeout-duration: 15s
