@@ -21,3 +21,11 @@ tdx:
   client-secret: ${TDX_CLIENT_SECRET}
   base-url: https://tdx.transportdata.tw/api/basic
   auth-url: https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token
+
+resilience4j:
+  ratelimiter:
+    instances:
+      tdx:
+        limit-for-period: 5
+        limit-refresh-period: 1s
+        timeout-duration: 10s

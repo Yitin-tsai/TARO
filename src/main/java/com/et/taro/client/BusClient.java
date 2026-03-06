@@ -3,13 +3,13 @@ package com.et.taro.client;
 import com.et.taro.dto.tdx.TdxBusEstimate;
 import com.et.taro.dto.tdx.TdxBusRoute;
 import com.et.taro.dto.tdx.TdxBusStop;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +25,7 @@ public class BusClient {
     /**
      * 使用 TDX 空間查詢找附近公車站牌
      */
+    @RateLimiter(name = "tdx")
     public List<TdxBusStop> fetchNearbyStops(String city, double lat, double lng, int radiusMeters) {
         String uri = String.format(
                 "/v2/Bus/Stop/City/%s?$spatialFilter=nearby(%f,%f,%d)&$format=JSON",
@@ -52,6 +53,7 @@ public class BusClient {
     /**
      * 查詢即時到站時間，用 StopID 過濾
      */
+    @RateLimiter(name = "tdx")
     public List<TdxBusEstimate> fetchEstimates(String city, List<String> stopIds) {
         if (stopIds.isEmpty()) return List.of();
 
@@ -85,6 +87,7 @@ public class BusClient {
     /**
      * 查詢城市所有公車路線起迄站名，快取 24 小時
      */
+    @RateLimiter(name = "tdx")
     @Cacheable(value = "busRoutes", sync = true)
     public List<TdxBusRoute> fetchRoutes(String city) {
         String uri = String.format(

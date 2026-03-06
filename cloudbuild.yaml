@@ -1,0 +1,8 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'taro'
+      - '--source=.'
+      - '--region=asia-east1'
