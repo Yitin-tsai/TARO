@@ -29,6 +29,9 @@ public class BusClient {
      */
     @Retry(name = "tdx")
     @RateLimiter(name = "tdx")
+    @Cacheable(value = "busNearbyStops",
+            key = "#city + '-' + T(Math).round(#lat * 1000) + '-' + T(Math).round(#lng * 1000) + '-' + #radiusMeters",
+            sync = true)
     public List<TdxBusStop> fetchNearbyStops(String city, double lat, double lng, int radiusMeters) {
         String uri = String.format(
                 "/v2/Bus/Stop/City/%s?$spatialFilter=nearby(%f,%f,%d)&$format=JSON",

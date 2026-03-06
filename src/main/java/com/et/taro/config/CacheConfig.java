@@ -25,7 +25,8 @@ public class CacheConfig {
                 buildCache("metroStations", Duration.ofHours(24), 10),
                 buildCache("metroTimeTables", Duration.ofHours(24), 10),
                 buildCache("metroExits", Duration.ofHours(24), 10),
-                buildCache("busRoutes", Duration.ofHours(24), 10)
+                buildCache("busRoutes", Duration.ofHours(24), 10),
+                buildCache("busNearbyStops", Duration.ofSeconds(60), 50)
         ));
         return manager;
     }

@@ -37,13 +37,17 @@ public class BusService {
         Map<String, String> stopCityMap = new HashMap<>(); // stopId → city
         List<TdxBusStop> allStops = new ArrayList<>();
         for (String city : CITIES) {
-            List<TdxBusStop> cityStops = busClient.fetchNearbyStops(city, lat, lng, DEFAULT_RADIUS);
-            for (TdxBusStop stop : cityStops) {
-                if (stop.getStopId() != null) {
-                    stopCityMap.put(stop.getStopId(), city);
+            try {
+                List<TdxBusStop> cityStops = busClient.fetchNearbyStops(city, lat, lng, DEFAULT_RADIUS);
+                for (TdxBusStop stop : cityStops) {
+                    if (stop.getStopId() != null) {
+                        stopCityMap.put(stop.getStopId(), city);
+                    }
                 }
+                allStops.addAll(cityStops);
+            } catch (Exception e) {
+                log.warn("Failed to fetch nearby bus stops for {}, continuing with other cities", city);
             }
-            allStops.addAll(cityStops);
         }
 
         if (allStops.isEmpty()) {
@@ -96,12 +100,19 @@ public class BusService {
         for (String city : CITIES) {
             List<String> cityStopIds = stopIdsByCity.getOrDefault(city, List.of());
             if (!cityStopIds.isEmpty()) {
-                allEstimates.addAll(busClient.fetchEstimates(city, cityStopIds));
-                // 路線起迄站名（cached 24hr，~500 條很小）
-                for (TdxBusRoute route : busClient.fetchRoutes(city)) {
-                    if (route.getRouteId() != null) {
-                        routeMap.putIfAbsent(route.getRouteId(), route);
+                try {
+                    allEstimates.addAll(busClient.fetchEstimates(city, cityStopIds));
+                } catch (Exception e) {
+                    log.warn("Failed to fetch bus estimates for {}, continuing with partial data", city);
+                }
+                try {
+                    for (TdxBusRoute route : busClient.fetchRoutes(city)) {
+                        if (route.getRouteId() != null) {
+                            routeMap.putIfAbsent(route.getRouteId(), route);
+                        }
                     }
+                } catch (Exception e) {
+                    log.warn("Failed to fetch bus routes for {}, continuing with partial data", city);
                 }
             }
         }
